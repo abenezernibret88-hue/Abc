@@ -1,0 +1,1198 @@
+```html
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartHub - Ultimate Smartphone Explorer & AI Assistant</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind Config for custom theme colors -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    /* Custom Scrollbar for sleek UI */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #1e293b;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #475569;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #6366f1;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-brand-500 selection:text-white">
+
+  <!-- Header / Navigation -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+        <div class="bg-gradient-to-tr from-brand-600 to-indigo-400 p-2 rounded-xl shadow-lg shadow-brand-500/20">
+          <i data-lucide="smartphone" class="w-6 h-6 text-white"></i>
+        </div>
+        <div>
+          <span class="text-xl font-bold tracking-tight bg-gradient-to-r from-white via-slate-200 to-brand-400 bg-clip-text text-transparent">SmartHub</span>
+          <span class="text-[10px] block text-slate-400 font-mono tracking-wider -mt-1">INTELLIGENT FINDER</span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="hidden md:flex space-x-1 bg-slate-950/60 p-1.5 rounded-xl border border-slate-800">
+        <button onclick="switchTab('home')" id="tab-btn-home" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-brand-400 bg-slate-900">
+          <i data-lucide="home" class="w-4 h-4"></i> Explore
+        </button>
+        <button onclick="switchTab('compare')" id="tab-btn-compare" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <i data-lucide="columns-2" class="w-4 h-4"></i> Compare
+        </button>
+        <button onclick="switchTab('quiz')" id="tab-btn-quiz" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <i data-lucide="sparkles" class="w-4 h-4"></i> Matchmaker
+        </button>
+        <button onclick="switchTab('ai')" id="tab-btn-ai" class="nav-btn px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-slate-400 hover:text-slate-200">
+          <i data-lucide="bot" class="w-4 h-4"></i> AI Advisor
+        </button>
+      </nav>
+
+      <!-- Quick Search Bar / Right Actions -->
+      <div class="flex items-center space-x-3">
+        <div class="relative hidden sm:block">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+            <i data-lucide="search" class="w-4 h-4"></i>
+          </span>
+          <input type="text" id="global-search" oninput="handleSearch(this.value)" placeholder="Search models..." class="w-48 lg:w-64 bg-slate-950 border border-slate-800 rounded-xl py-1.5 pl-9 pr-4 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent text-slate-200 placeholder-slate-500 transition-all duration-300">
+        </div>
+        <button onclick="switchTab('ai')" class="bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-lg shadow-brand-600/20 active:scale-95 transition-all">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Ask AI
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Navigation Bottom Bar -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 border-t border-slate-800 backdrop-blur-lg z-50 flex justify-around py-3">
+    <button onclick="switchTab('home')" class="mobile-nav-btn flex flex-col items-center gap-1 text-brand-400" id="m-tab-home">
+      <i data-lucide="home" class="w-5 h-5"></i>
+      <span class="text-[10px]">Explore</span>
+    </button>
+    <button onclick="switchTab('compare')" class="mobile-nav-btn flex flex-col items-center gap-1 text-slate-400" id="m-tab-compare">
+      <i data-lucide="columns-2" class="w-5 h-5"></i>
+      <span class="text-[10px]">Compare</span>
+    </button>
+    <button onclick="switchTab('quiz')" class="mobile-nav-btn flex flex-col items-center gap-1 text-slate-400" id="m-tab-quiz">
+      <i data-lucide="sparkles" class="w-5 h-5"></i>
+      <span class="text-[10px]">Match</span>
+    </button>
+    <button onclick="switchTab('ai')" class="mobile-nav-btn flex flex-col items-center gap-1 text-slate-400" id="m-tab-ai">
+      <i data-lucide="bot" class="w-5 h-5"></i>
+      <span class="text-[10px]">AI Expert</span>
+    </button>
+  </div>
+
+  <!-- Main Content Body -->
+  <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full mb-16 md:mb-0">
+    
+    <!-- ==================== TAB: EXPLORE / HOME ==================== -->
+    <section id="tab-home" class="space-y-10">
+      <!-- Hero Banner -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 p-8 sm:p-12">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(99,102,241,0.15),transparent_45%)]"></div>
+        <div class="relative z-10 max-w-2xl space-y-4">
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-brand-500/10 text-brand-400 border border-brand-500/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-400 mr-2 animate-pulse"></span>2026 Mobile Database Active
+          </span>
+          <h1 class="text-3xl sm:text-5xl font-black tracking-tight leading-none text-white">
+            Discover Your Next <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 via-indigo-400 to-purple-400">Smartphone</span> Match.
+          </h1>
+          <p class="text-sm sm:text-base text-slate-400 leading-relaxed">
+            Search, filter, and compare top-tier devices with deep analytics. Stuck on choices? Engage our interactive Matchmaker or call on our intelligent AI companion to resolve any specs dilemma.
+          </p>
+          <div class="flex flex-wrap gap-3 pt-2">
+            <button onclick="switchTab('quiz')" class="bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold px-5 py-3 rounded-xl transition shadow-lg shadow-brand-500/15 flex items-center gap-2">
+              Start Matchmaker <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </button>
+            <button onclick="switchTab('compare')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold px-5 py-3 rounded-xl transition border border-slate-700 flex items-center gap-2">
+              Compare Specs <i data-lucide="git-compare" class="w-4 h-4"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats / Interactive Filter Panel -->
+      <div class="space-y-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-white tracking-tight">Smartphone Directory</h2>
+            <p class="text-xs text-slate-400">Real-time specifications, pricing guides, and direct scores.</p>
+          </div>
+          <!-- Filters -->
+          <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+            <button onclick="filterBrand('All')" class="brand-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-brand-600 text-white border border-brand-500" data-brand="All">All Brands</button>
+            <button onclick="filterBrand('Apple')" class="brand-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:bg-slate-800 transition" data-brand="Apple">Apple</button>
+            <button onclick="filterBrand('Samsung')" class="brand-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:bg-slate-800 transition" data-brand="Samsung">Samsung</button>
+            <button onclick="filterBrand('Google')" class="brand-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:bg-slate-800 transition" data-brand="Google">Google</button>
+            <button onclick="filterBrand('OnePlus')" class="brand-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:bg-slate-800 transition" data-brand="OnePlus">OnePlus</button>
+          </div>
+        </div>
+
+        <!-- Devices Grid -->
+        <div id="devices-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB: COMPARE ==================== -->
+    <section id="tab-compare" class="hidden space-y-8">
+      <div>
+        <h2 class="text-3xl font-extrabold text-white tracking-tight">Side-by-Side Comparison</h2>
+        <p class="text-slate-400 text-sm">Select any two devices to compare their hardware power, camera setups, and user value scores.</p>
+      </div>
+
+      <!-- Selector Panels -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-900/60 p-6 rounded-3xl border border-slate-800/80">
+        <!-- Phone A Selector -->
+        <div class="space-y-2">
+          <label class="block text-xs font-bold uppercase tracking-wider text-brand-400">Phone A</label>
+          <div class="relative">
+            <select id="compare-select-a" onchange="updateComparison()" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all appearance-none cursor-pointer">
+              <!-- Populated dynamically -->
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+              <i data-lucide="chevron-down" class="w-5 h-5"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Phone B Selector -->
+        <div class="space-y-2">
+          <label class="block text-xs font-bold uppercase tracking-wider text-brand-400">Phone B</label>
+          <div class="relative">
+            <select id="compare-select-b" onchange="updateComparison()" class="w-full bg-slate-950 border border-slate-800 rounded-2xl p-4 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all appearance-none cursor-pointer">
+              <!-- Populated dynamically -->
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
+              <i data-lucide="chevron-down" class="w-5 h-5"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparison Matrix Sheet -->
+      <div class="overflow-hidden border border-slate-800 rounded-3xl bg-slate-950 shadow-2xl">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-900/60 border-b border-slate-800">
+              <th class="p-4 sm:p-6 text-sm font-semibold text-slate-400 w-1/3">Specification</th>
+              <th id="comp-header-a" class="p-4 sm:p-6 text-base font-bold text-white text-center w-1/3">Phone A</th>
+              <th id="comp-header-b" class="p-4 sm:p-6 text-base font-bold text-white text-center w-1/3">Phone B</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-800/60 text-xs sm:text-sm">
+            <tr>
+              <td class="p-4 sm:p-6 font-medium text-slate-400">Brand / Series</td>
+              <td id="comp-brand-a" class="p-4 sm:p-6 text-center text-slate-200">-</td>
+              <td id="comp-brand-b" class="p-4 sm:p-6 text-center text-slate-200">-</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-6 font-medium text-slate-400">Estimated Price</td>
+              <td id="comp-price-a" class="p-4 sm:p-6 text-center text-brand-400 font-semibold">-</td>
+              <td id="comp-price-b" class="p-4 sm:p-6 text-center text-brand-400 font-semibold">-</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-6 font-medium text-slate-400">Display</td>
+              <td id="comp-display-a" class="p-4 sm:p-6 text-center text-slate-200">-</td>
+              <td id="comp-display-b" class="p-4 sm:p-6 text-center text-slate-200">-</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-6 font-medium text-slate-400">Processor</td>
+              <td id="comp-chip-a" class="p-4 sm:p-6 text-center text-slate-200 font-mono">-</td>
+              <td id="comp-chip-b" class="p-4 sm:p-6 text-center text-slate-200 font-mono">-</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-6 font-medium text-slate-400">Rear Camera Config</td>
+              <td id="comp-camera-a" class="p-4 sm:p-6 text-center text-slate-200">-</td>
+              <td id="comp-camera-b" class="p-4 sm:p-6 text-center text-slate-200">-</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-6 font-medium text-slate-400">Battery & Charging</td>
+              <td id="comp-battery-a" class="p-4 sm:p-6 text-center text-slate-200">-</td>
+              <td id="comp-battery-b" class="p-4 sm:p-6 text-center text-slate-200">-</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-6 font-medium text-slate-400">Storage Options</td>
+              <td id="comp-storage-a" class="p-4 sm:p-6 text-center text-slate-200">-</td>
+              <td id="comp-storage-b" class="p-4 sm:p-6 text-center text-slate-200">-</td>
+            </tr>
+            <tr>
+              <td class="p-4 sm:p-6 font-medium text-slate-400">Weight</td>
+              <td id="comp-weight-a" class="p-4 sm:p-6 text-center text-slate-200">-</td>
+              <td id="comp-weight-b" class="p-4 sm:p-6 text-center text-slate-200">-</td>
+            </tr>
+            <!-- Performance Bars -->
+            <tr class="bg-slate-900/10">
+              <td class="p-4 sm:p-6 font-medium text-slate-400">Performance Index</td>
+              <td class="p-4 sm:p-6">
+                <div class="flex flex-col items-center gap-1.5">
+                  <span id="score-perf-a" class="font-bold text-white">0/10</span>
+                  <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div id="bar-perf-a" class="bg-indigo-500 h-full transition-all duration-500" style="width: 0%"></div>
+                  </div>
+                </div>
+              </td>
+              <td class="p-4 sm:p-6">
+                <div class="flex flex-col items-center gap-1.5">
+                  <span id="score-perf-b" class="font-bold text-white">0/10</span>
+                  <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div id="bar-perf-b" class="bg-indigo-500 h-full transition-all duration-500" style="width: 0%"></div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr class="bg-slate-900/10">
+              <td class="p-4 sm:p-6 font-medium text-slate-400">Camera Grade</td>
+              <td class="p-4 sm:p-6">
+                <div class="flex flex-col items-center gap-1.5">
+                  <span id="score-cam-a" class="font-bold text-white">0/10</span>
+                  <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div id="bar-cam-a" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
+                  </div>
+                </div>
+              </td>
+              <td class="p-4 sm:p-6">
+                <div class="flex flex-col items-center gap-1.5">
+                  <span id="score-cam-b" class="font-bold text-white">0/10</span>
+                  <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                    <div id="bar-cam-b" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==================== TAB: MATCHMAKER (QUIZ) ==================== -->
+    <section id="tab-quiz" class="hidden max-w-2xl mx-auto space-y-8">
+      <div class="text-center space-y-2">
+        <h2 class="text-3xl font-extrabold text-white tracking-tight">Smartphone Matchmaker</h2>
+        <p class="text-slate-400 text-sm">Tell us about your usage patterns, budget, and priorities. Our algorithm will match you to your ideal tech device.</p>
+      </div>
+
+      <!-- Quiz Card Box -->
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xl relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-1 bg-slate-800">
+          <div id="quiz-progress" class="h-full bg-gradient-to-r from-brand-500 to-indigo-400 transition-all duration-300" style="width: 25%"></div>
+        </div>
+
+        <div id="quiz-question-container" class="space-y-6 pt-4">
+          <!-- Question content loaded dynamically -->
+        </div>
+
+        <!-- Quiz Navigation -->
+        <div class="flex justify-between items-center pt-8 border-t border-slate-800/80 mt-8">
+          <button id="quiz-prev-btn" onclick="prevQuizStep()" class="text-slate-400 hover:text-slate-200 text-sm font-semibold flex items-center gap-1 disabled:opacity-30" disabled>
+            <i data-lucide="chevron-left" class="w-4 h-4"></i> Back
+          </button>
+          <span id="quiz-step-indicator" class="text-xs font-mono text-slate-500">Step 1 of 4</span>
+          <button id="quiz-next-btn" onclick="nextQuizStep()" class="bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition flex items-center gap-1">
+            Next <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quiz Results Panel (Hidden Initially) -->
+      <div id="quiz-results" class="hidden bg-slate-900 border-2 border-brand-500/20 rounded-3xl p-6 sm:p-8 space-y-6">
+        <div class="text-center space-y-1">
+          <span class="text-xs font-bold tracking-wider text-brand-400 uppercase">Match Found</span>
+          <h3 class="text-2xl font-bold text-white">Your Perfect Daily Companion</h3>
+        </div>
+        
+        <div id="matched-device-card" class="bg-slate-950 p-6 rounded-2xl border border-slate-800 flex flex-col sm:flex-row items-center gap-6">
+          <!-- Suggested Device Card dynamically inserted -->
+        </div>
+
+        <div class="flex justify-center gap-3">
+          <button onclick="restartQuiz()" class="text-slate-400 hover:text-white text-sm font-semibold border border-slate-800 px-5 py-2.5 rounded-xl transition">Retake Matchmaker</button>
+          <button id="compare-matched-btn" class="bg-slate-800 hover:bg-slate-700 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition flex items-center gap-2">
+            Compare Against Others <i data-lucide="columns-2" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB: AI ADVISOR ==================== -->
+    <section id="tab-ai" class="hidden space-y-8">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 class="text-3xl font-extrabold text-white tracking-tight flex items-center gap-2.5">
+            SmartAdvisor AI <span class="text-xs px-2.5 py-1 bg-brand-500/10 text-brand-400 border border-brand-500/20 rounded-full font-mono font-medium tracking-normal">Live Assistant</span>
+          </h2>
+          <p class="text-slate-400 text-sm">Empowered by Gemini 2.5 Flash, get instantaneous advice, specification breakdowns, or purchasing evaluations with live search grounding.</p>
+        </div>
+        <!-- Active Search Badge status -->
+        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs text-slate-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Google Search Grounding Enabled
+        </span>
+      </div>
+
+      <!-- Chat Canvas -->
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- Prompts Bank / Sidebar -->
+        <div class="lg:col-span-1 space-y-4">
+          <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-3">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Suggested Questions</h3>
+            <div class="space-y-2">
+              <button onclick="usePreloadQuestion('Should I buy the iPhone 16 Pro Max or Galaxy S24 Ultra? Highlight main differences.')" class="w-full text-left text-xs bg-slate-950 hover:bg-slate-800 border border-slate-850 p-2.5 rounded-xl text-slate-300 transition hover:border-brand-500/30">
+                Compare: iPhone 16 Pro vs S24 Ultra
+              </button>
+              <button onclick="usePreloadQuestion('I am a mobile gamer. What should I prioritize: high touch sampling rate or processor GPU? Which phone under $800 is best?')" class="w-full text-left text-xs bg-slate-950 hover:bg-slate-800 border border-slate-850 p-2.5 rounded-xl text-slate-300 transition hover:border-brand-500/30">
+                Best phone for high-tier gaming?
+              </button>
+              <button onclick="usePreloadQuestion('Explain the differences in zoom quality between digital zoom and periscope optical zoom.')" class="w-full text-left text-xs bg-slate-950 hover:bg-slate-800 border border-slate-850 p-2.5 rounded-xl text-slate-300 transition hover:border-brand-500/30">
+                Explain Periscope Zoom cameras
+              </button>
+            </div>
+          </div>
+          <!-- Disclaimer -->
+          <p class="text-[10px] text-slate-500 leading-relaxed px-1">
+            *AI advice utilizes live search tools. Results represent general market comparisons. Always consult manufacturers before final purchasing.
+          </p>
+        </div>
+
+        <!-- Interaction Terminal -->
+        <div class="lg:col-span-3 bg-slate-900 border border-slate-800 rounded-3xl flex flex-col h-[550px] relative overflow-hidden shadow-xl">
+          <!-- Chat Feed -->
+          <div id="ai-chat-feed" class="flex-grow overflow-y-auto p-6 space-y-4">
+            <!-- Warmup Message -->
+            <div class="flex gap-4 max-w-3xl">
+              <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center shrink-0 shadow-md">
+                <i data-lucide="bot" class="w-4 h-4 text-white"></i>
+              </div>
+              <div class="bg-slate-950 border border-slate-800/80 rounded-2xl p-4 text-slate-300 text-sm space-y-2">
+                <p>Hello! I am your interactive **SmartHub AI Specialist**. You can ask me to write code, design comparison spreadsheets, parse complex specs, or recommend smartphones based on real-time market values.</p>
+                <p class="text-xs text-slate-500 font-mono">Status: Connected | Search Enabled</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Loading Progress bar -->
+          <div id="ai-loading-bar" class="hidden absolute bottom-[72px] left-0 right-0 h-1 bg-slate-800 overflow-hidden">
+            <div class="h-full bg-brand-500 w-1/3 animate-bounce"></div>
+          </div>
+
+          <!-- Input Panel -->
+          <div class="p-4 bg-slate-950 border-t border-slate-800/80 flex items-center gap-3">
+            <input type="text" id="ai-input" onkeypress="handleChatKey(event)" placeholder="Ask SmartAdvisor AI (e.g., 'Compare OnePlus 12 battery life to Pixel 9 Pro')" class="flex-grow bg-slate-900 border border-slate-850 rounded-2xl py-3 px-4 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-all placeholder:text-slate-500">
+            <button onclick="sendChatMessage()" class="bg-brand-600 hover:bg-brand-500 text-white p-3 rounded-2xl shadow-lg shadow-brand-500/15 active:scale-95 transition-all">
+              <i data-lucide="send" class="w-5 h-5"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Spec Modal Overlay (Interactive Device Deep-Dive) -->
+  <div id="spec-modal" class="hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl relative">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-950 border border-slate-800 p-1.5 rounded-xl transition">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="p-6 sm:p-8 space-y-6">
+        <!-- Header -->
+        <div class="flex items-center space-x-4">
+          <div id="modal-icon-bg" class="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-brand-400 text-2xl font-bold">
+            📱
+          </div>
+          <div>
+            <h3 id="modal-title" class="text-2xl font-bold text-white leading-none">-</h3>
+            <p id="modal-brand" class="text-xs font-mono text-brand-400 mt-1">-</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+          <!-- Main details -->
+          <div class="bg-slate-950 border border-slate-850 p-4 rounded-xl space-y-2">
+            <span class="text-slate-500 font-bold block uppercase tracking-wide text-[10px]">Processing & Memory</span>
+            <p class="text-slate-200 font-semibold" id="modal-processor">-</p>
+            <p class="text-slate-400 text-xs" id="modal-memory">-</p>
+          </div>
+          <div class="bg-slate-950 border border-slate-850 p-4 rounded-xl space-y-2">
+            <span class="text-slate-500 font-bold block uppercase tracking-wide text-[10px]">Display Panel</span>
+            <p class="text-slate-200 font-semibold" id="modal-display">-</p>
+            <p class="text-slate-400 text-xs" id="modal-resolution">-</p>
+          </div>
+          <div class="bg-slate-950 border border-slate-850 p-4 rounded-xl space-y-2">
+            <span class="text-slate-500 font-bold block uppercase tracking-wide text-[10px]">Camera Array</span>
+            <p class="text-slate-200 font-semibold" id="modal-camera">-</p>
+            <p class="text-slate-400 text-xs" id="modal-camdetails">-</p>
+          </div>
+          <div class="bg-slate-950 border border-slate-850 p-4 rounded-xl space-y-2">
+            <span class="text-slate-500 font-bold block uppercase tracking-wide text-[10px]">Power & Charging</span>
+            <p class="text-slate-200 font-semibold" id="modal-battery">-</p>
+            <p class="text-slate-400 text-xs" id="modal-charging">-</p>
+          </div>
+        </div>
+
+        <!-- Pros and Cons -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-emerald-950/20 border border-emerald-900/30 p-4 rounded-xl space-y-1">
+            <span class="text-emerald-400 font-bold text-xs flex items-center gap-1">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i> Notable Pros
+            </span>
+            <ul class="list-disc pl-4 text-xs text-slate-300 space-y-1" id="modal-pros"></ul>
+          </div>
+          <div class="bg-rose-950/20 border border-rose-900/30 p-4 rounded-xl space-y-1">
+            <span class="text-rose-400 font-bold text-xs flex items-center gap-1">
+              <i data-lucide="minus-circle" class="w-4 h-4"></i> Notable Cons
+            </span>
+            <ul class="list-disc pl-4 text-xs text-slate-300 space-y-1" id="modal-cons"></ul>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+          <button onclick="closeModal()" class="bg-slate-950 border border-slate-800 text-slate-300 text-xs font-semibold px-4 py-2.5 rounded-xl transition hover:bg-slate-800">Close</button>
+          <button id="modal-compare-btn" class="bg-brand-600 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition hover:bg-brand-500 flex items-center gap-1">
+            <i data-lucide="columns-2" class="w-3.5 h-3.5"></i> Add to Compare
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-slate-950 border-t border-slate-900 py-8 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 space-y-2">
+      <p class="font-semibold text-slate-400">&copy; 2026 SmartHub Technologies. All rights reserved.</p>
+      <p>Data metrics aggregated based on general system capabilities & verified specs.</p>
+    </div>
+  </footer>
+
+  <!-- ==================== LOGIC / DATABASE SCRIPT ==================== -->
+  <script>
+    // Robust in-memory static smartphone dataset
+    const phonesDb = [
+      {
+        id: "iphone-16-pro-max",
+        name: "iPhone 16 Pro Max",
+        brand: "Apple",
+        price: "$1,199",
+        numPrice: 1199,
+        screen: "6.9\" LTPO Super Retina XDR OLED, 120Hz",
+        processor: "Apple A18 Pro (3nm)",
+        storage: "256GB / 512GB / 1TB",
+        camera: "48MP Main + 48MP Ultrawide + 12MP 5x Periscope Zoom",
+        battery: "4685 mAh, 25W MagSafe, 30W Wired",
+        weight: "227g",
+        performanceScore: 10,
+        cameraScore: 9.8,
+        icon: "🍎",
+        pros: ["Remarkable A18 Pro processing speed", "Unbeatable video recording stability", "Superior battery efficiency"],
+        cons: ["Still charges slower than competitors", "Titanium body is slightly heavy"]
+      },
+      {
+        id: "galaxy-s24-ultra",
+        name: "Galaxy S24 Ultra",
+        brand: "Samsung",
+        price: "$1,299",
+        numPrice: 1299,
+        screen: "6.8\" Dynamic AMOLED 2X, 120Hz, Gorilla Armor",
+        processor: "Snapdragon 8 Gen 3 for Galaxy",
+        storage: "256GB / 512GB / 1TB",
+        camera: "200MP Main + 50MP 5x Periscope + 10MP 3x + 12MP Ultrawide",
+        battery: "5000 mAh, 45W Wired, 15W Wireless",
+        weight: "232g",
+        performanceScore: 9.7,
+        cameraScore: 9.7,
+        icon: "🪐",
+        pros: ["Built-in S-Pen styling", "Extremely versatile 4-camera array", "Anti-reflective Gorilla Armor screen"],
+        cons: ["Square corners make it bulky", "Expensive list price"]
+      },
+      {
+        id: "pixel-9-pro-xl",
+        name: "Google Pixel 9 Pro XL",
+        brand: "Google",
+        price: "$1,099",
+        numPrice: 1099,
+        screen: "6.8\" LTPO OLED, 120Hz, 3000 nits peak",
+        processor: "Google Tensor G4 (4nm)",
+        storage: "128GB / 256GB / 512GB / 1TB",
+        camera: "50MP Main + 48MP 5x Zoom + 48MP Ultrawide",
+        battery: "5060 mAh, 45W Wired, 23W Pixel Stand",
+        weight: "221g",
+        performanceScore: 8.8,
+        cameraScore: 9.9,
+        icon: "💎",
+        pros: ["Industry-leading AI photo rendering", "Clean stock Pixel UI with 7 years of OS updates", "Immersive, bright display panel"],
+        cons: ["Raw gaming performance trails Snapdragon", "Slow local file transfers"]
+      },
+      {
+        id: "oneplus-12",
+        name: "OnePlus 12",
+        brand: "OnePlus",
+        price: "$799",
+        numPrice: 799,
+        screen: "6.82\" BOE X1 LTPO AMOLED, 120Hz",
+        processor: "Snapdragon 8 Gen 3 (4nm)",
+        storage: "256GB / 512GB",
+        camera: "50MP Main + 64MP 3x Zoom + 48MP Ultrawide",
+        battery: "5400 mAh, 100W Wired SuperVOOC",
+        weight: "220g",
+        performanceScore: 9.6,
+        cameraScore: 9.0,
+        icon: "⚡",
+        pros: ["Exceptional 100W ultra-fast charging", "Massive 5400mAh battery reserve", "Unmatched value-to-performance ratio"],
+        cons: ["Zoom capabilities slightly weaker than Ultra level", "No official IP68 rating in all markets"]
+      },
+      {
+        id: "galaxy-s24-plus",
+        name: "Galaxy S24+",
+        brand: "Samsung",
+        price: "$999",
+        numPrice: 999,
+        screen: "6.7\" Dynamic AMOLED 2X, 120Hz",
+        processor: "Snapdragon 8 Gen 3 / Exynos 2400",
+        storage: "256GB / 512GB",
+        camera: "50MP Main + 10MP 3x Zoom + 12MP Ultrawide",
+        battery: "4900 mAh, 45W Wired",
+        weight: "196g",
+        performanceScore: 9.5,
+        cameraScore: 8.9,
+        icon: "📱",
+        pros: ["Extremely lightweight for a big screen", "Vibrant and sharp QHD+ screen panel", "Consistent, high-yield battery"],
+        cons: ["Lacks the supreme camera zoom details of the Ultra", "No S-Pen compatibility"]
+      },
+      {
+        id: "iphone-16",
+        name: "iPhone 16",
+        brand: "Apple",
+        price: "$799",
+        numPrice: 799,
+        screen: "6.1\" Super Retina XDR OLED, 60Hz",
+        processor: "Apple A18 (3nm)",
+        storage: "128GB / 256GB / 512GB",
+        camera: "48MP Main + 12MP Ultrawide",
+        battery: "3561 mAh, 25W MagSafe",
+        weight: "170g",
+        performanceScore: 9.2,
+        cameraScore: 8.6,
+        icon: "🍎",
+        pros: ["Incredibly fast A18 processing chip", "Compact and comfortable ergonomics", "New Action and Camera Control buttons"],
+        cons: ["Disappointing 60Hz screen refresh rate", "No dedicated optical zoom lens"]
+      }
+    ];
+
+    // Current Active Tab
+    let activeTab = 'home';
+    let selectedBrandFilter = 'All';
+
+    // Initialize application UI
+    window.onload = function() {
+      lucide.createIcons();
+      renderDevices();
+      populateDropdowns();
+      initQuiz();
+    }
+
+    // Switch between site navigation tabs
+    function switchTab(tabId) {
+      activeTab = tabId;
+      
+      // Hide all tabs
+      document.getElementById('tab-home').classList.add('hidden');
+      document.getElementById('tab-compare').classList.add('hidden');
+      document.getElementById('tab-quiz').classList.add('hidden');
+      document.getElementById('tab-ai').classList.add('hidden');
+      
+      // Show selected tab
+      document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+      // Update Header Tab Buttons styling
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('text-brand-400', 'bg-slate-900');
+        btn.classList.add('text-slate-400', 'hover:text-slate-200');
+      });
+      const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('text-slate-400', 'hover:text-slate-200');
+        activeBtn.classList.add('text-brand-400', 'bg-slate-900');
+      }
+
+      // Update mobile bottom bar styling
+      document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        btn.classList.remove('text-brand-400');
+        btn.classList.add('text-slate-400');
+      });
+      const activeMobBtn = document.getElementById(`m-tab-${tabId}`);
+      if (activeMobBtn) {
+        activeMobBtn.classList.remove('text-slate-400');
+        activeMobBtn.classList.add('text-brand-400');
+      }
+    }
+
+    // Filter Brand Selector
+    function filterBrand(brand) {
+      selectedBrandFilter = brand;
+      document.querySelectorAll('.brand-filter-btn').forEach(btn => {
+        const btnBrand = btn.getAttribute('data-brand');
+        if (btnBrand === brand) {
+          btn.className = "brand-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-brand-600 text-white border border-brand-500";
+        } else {
+          btn.className = "brand-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-slate-900 text-slate-400 border border-slate-800 hover:bg-slate-800 transition";
+        }
+      });
+      renderDevices();
+    }
+
+    // Handle Search Inputs
+    function handleSearch(val) {
+      renderDevices(val.toLowerCase());
+    }
+
+    // Render Devices Grid
+    function renderDevices(filterQuery = "") {
+      const grid = document.getElementById('devices-grid');
+      grid.innerHTML = "";
+
+      const filtered = phonesDb.filter(phone => {
+        const matchesBrand = selectedBrandFilter === 'All' || phone.brand === selectedBrandFilter;
+        const matchesQuery = phone.name.toLowerCase().includes(filterQuery) || phone.processor.toLowerCase().includes(filterQuery);
+        return matchesBrand && matchesQuery;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-12 space-y-3">
+            <i data-lucide="info" class="w-12 h-12 text-slate-600 mx-auto"></i>
+            <h3 class="text-base font-bold text-slate-300">No matching models found</h3>
+            <p class="text-xs text-slate-500">Try modifying your text query or changing your brand selections.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      filtered.forEach(phone => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-900 border border-slate-800/80 rounded-2xl p-5 hover:border-brand-500/50 transition-all duration-300 flex flex-col justify-between group cursor-pointer hover:-translate-y-1 relative overflow-hidden";
+        card.innerHTML = `
+          <div>
+            <!-- Header Icons/Brand -->
+            <div class="flex justify-between items-start mb-4">
+              <span class="text-xs font-mono px-2 py-0.5 rounded-md bg-slate-950 text-slate-400 border border-slate-850">${phone.brand}</span>
+              <span class="text-2xl">${phone.icon}</span>
+            </div>
+            
+            <!-- Details -->
+            <h3 class="text-lg font-bold text-white group-hover:text-brand-400 transition mb-1">${phone.name}</h3>
+            <p class="text-xs text-slate-500 font-mono mb-3 line-clamp-1">${phone.processor}</p>
+            
+            <div class="space-y-2 text-xs text-slate-400">
+              <div class="flex items-center gap-2">
+                <i data-lucide="expand" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>${phone.screen.split(',')[0]}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <i data-lucide="camera" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span class="truncate">${phone.camera.split('+')[0]}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pt-5 mt-5 border-t border-slate-800/80 flex items-center justify-between">
+            <span class="text-base font-bold text-brand-400">${phone.price}</span>
+            <button onclick="openSpecModal('${phone.id}'); event.stopPropagation();" class="text-xs bg-slate-950 hover:bg-slate-800 text-slate-200 border border-slate-800 px-3 py-1.5 rounded-lg transition">
+              Specs
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    // Modal Manager
+    function openSpecModal(phoneId) {
+      const phone = phonesDb.find(p => p.id === phoneId);
+      if (!phone) return;
+
+      document.getElementById('modal-title').textContent = phone.name;
+      document.getElementById('modal-brand').textContent = `${phone.brand.toUpperCase()} DIRECTORY`;
+      document.getElementById('modal-icon-bg').textContent = phone.icon;
+      document.getElementById('modal-processor').textContent = phone.processor;
+      document.getElementById('modal-memory').textContent = `RAM Configurations combined with storage options: ${phone.storage}`;
+      document.getElementById('modal-display').textContent = phone.screen;
+      document.getElementById('modal-resolution').textContent = "Ultra High Refresh with HDR10+ Adaptive Tech";
+      document.getElementById('modal-camera').textContent = phone.camera;
+      document.getElementById('modal-camdetails').textContent = "Cinematic video modes, computational night enhancement.";
+      document.getElementById('modal-battery').textContent = phone.battery;
+      document.getElementById('modal-charging').textContent = `Wired Charging speeds: Fast replenishment with modern adapter`;
+
+      // Pros list
+      const prosContainer = document.getElementById('modal-pros');
+      prosContainer.innerHTML = "";
+      phone.pros.forEach(pro => {
+        const li = document.createElement('li');
+        li.textContent = pro;
+        prosContainer.appendChild(li);
+      });
+
+      // Cons list
+      const consContainer = document.getElementById('modal-cons');
+      consContainer.innerHTML = "";
+      phone.cons.forEach(con => {
+        const li = document.createElement('li');
+        li.textContent = con;
+        consContainer.appendChild(li);
+      });
+
+      // Set Up compare button action
+      const compareBtn = document.getElementById('modal-compare-btn');
+      compareBtn.onclick = () => {
+        document.getElementById('compare-select-a').value = phone.id;
+        updateComparison();
+        switchTab('compare');
+        closeModal();
+      };
+
+      document.getElementById('spec-modal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('spec-modal').classList.add('hidden');
+    }
+
+    // ==================== COMPARE TAB LOGIC ====================
+    function populateDropdowns() {
+      const selectA = document.getElementById('compare-select-a');
+      const selectB = document.getElementById('compare-select-b');
+      selectA.innerHTML = "";
+      selectB.innerHTML = "";
+
+      phonesDb.forEach((phone, idx) => {
+        const optA = document.createElement('option');
+        optA.value = phone.id;
+        optA.textContent = phone.name;
+        if (idx === 0) optA.selected = true;
+        selectA.appendChild(optA);
+
+        const optB = document.createElement('option');
+        optB.value = phone.id;
+        optB.textContent = phone.name;
+        if (idx === 1) optB.selected = true;
+        selectB.appendChild(optB);
+      });
+
+      updateComparison();
+    }
+
+    function updateComparison() {
+      const idA = document.getElementById('compare-select-a').value;
+      const idB = document.getElementById('compare-select-b').value;
+
+      const phoneA = phonesDb.find(p => p.id === idA);
+      const phoneB = phonesDb.find(p => p.id === idB);
+
+      if (!phoneA || !phoneB) return;
+
+      // Update Column Headers
+      document.getElementById('comp-header-a').textContent = phoneA.name;
+      document.getElementById('comp-header-b').textContent = phoneB.name;
+
+      // Set general specifications
+      document.getElementById('comp-brand-a').textContent = phoneA.brand;
+      document.getElementById('comp-brand-b').textContent = phoneB.brand;
+
+      document.getElementById('comp-price-a').textContent = phoneA.price;
+      document.getElementById('comp-price-b').textContent = phoneB.price;
+
+      document.getElementById('comp-display-a').textContent = phoneA.screen;
+      document.getElementById('comp-display-b').textContent = phoneB.screen;
+
+      document.getElementById('comp-chip-a').textContent = phoneA.processor;
+      document.getElementById('comp-chip-b').textContent = phoneB.processor;
+
+      document.getElementById('comp-camera-a').textContent = phoneA.camera;
+      document.getElementById('comp-camera-b').textContent = phoneB.camera;
+
+      document.getElementById('comp-battery-a').textContent = phoneA.battery;
+      document.getElementById('comp-battery-b').textContent = phoneB.battery;
+
+      document.getElementById('comp-storage-a').textContent = phoneA.storage;
+      document.getElementById('comp-storage-b').textContent = phoneB.storage;
+
+      document.getElementById('comp-weight-a').textContent = phoneA.weight;
+      document.getElementById('comp-weight-b').textContent = phoneB.weight;
+
+      // Update Performance Indicators
+      document.getElementById('score-perf-a').textContent = `${phoneA.performanceScore}/10`;
+      document.getElementById('score-perf-b').textContent = `${phoneB.performanceScore}/10`;
+      document.getElementById('bar-perf-a').style.width = `${phoneA.performanceScore * 10}%`;
+      document.getElementById('bar-perf-b').style.width = `${phoneB.performanceScore * 10}%`;
+
+      document.getElementById('score-cam-a').textContent = `${phoneA.cameraScore}/10`;
+      document.getElementById('score-cam-b').textContent = `${phoneB.cameraScore}/10`;
+      document.getElementById('bar-cam-a').style.width = `${phoneA.cameraScore * 10}%`;
+      document.getElementById('bar-cam-b').style.width = `${phoneB.cameraScore * 10}%`;
+    }
+
+    // ==================== MATCHMAKER (QUIZ) LOGIC ====================
+    let quizStep = 0;
+    const quizState = {
+      budget: null,
+      priority: null,
+      os: null,
+      size: null
+    };
+
+    const quizQuestions = [
+      {
+        field: "budget",
+        text: "What is your target budget for a new smartphone?",
+        options: [
+          { value: "budget", label: "Under $800 (Value Kings)" },
+          { value: "premium", label: "$800 - $1,100 (High-End Premium)" },
+          { value: "ultra", label: "$1,100+ (Ultra-Enthusiast Flagships)" }
+        ]
+      },
+      {
+        field: "priority",
+        text: "What is your primary design or hardware focus?",
+        options: [
+          { value: "performance", label: "Peak Performance & Gaming" },
+          { value: "camera", label: "Professional Grade Photography & Video" },
+          { value: "battery", label: "All-day Battery Capacity & Superfast Charging" }
+        ]
+      },
+      {
+        field: "os",
+        text: "Which operating ecosystem fits your lifestyle?",
+        options: [
+          { value: "iOS", label: "Apple iOS (Seamless Eco-system)" },
+          { value: "Android", label: "Android (Freedom to customize & S-Pens)" },
+          { value: "any", label: "No Preference (I want the best hardware regardless)" }
+        ]
+      },
+      {
+        field: "size",
+        text: "What is your preference on physical size & weight?",
+        options: [
+          { value: "compact", label: "Compact & lightweight (Easy single-hand hold)" },
+          { value: "large", label: "Max display size (Great for media & reading)" }
+        ]
+      }
+    ];
+
+    function initQuiz() {
+      quizStep = 0;
+      quizState.budget = null;
+      quizState.priority = null;
+      quizState.os = null;
+      quizState.size = null;
+      document.getElementById('quiz-results').classList.add('hidden');
+      document.getElementById('quiz-question-container').parentElement.classList.remove('hidden');
+      renderQuizStep();
+    }
+
+    function renderQuizStep() {
+      const question = quizQuestions[quizStep];
+      const progress = ((quizStep + 1) / quizQuestions.length) * 100;
+      document.getElementById('quiz-progress').style.width = `${progress}%`;
+      document.getElementById('quiz-step-indicator').textContent = `Step ${quizStep + 1} of ${quizQuestions.length}`;
+
+      const container = document.getElementById('quiz-question-container');
+      container.innerHTML = `
+        <h3 class="text-xl font-bold text-white">${question.text}</h3>
+        <div class="grid grid-cols-1 gap-3 pt-2">
+          ${question.options.map((opt, idx) => {
+            const isSelected = quizState[question.field] === opt.value;
+            const selectClass = isSelected ? 'border-brand-500 bg-brand-500/10' : 'border-slate-800 bg-slate-950 hover:border-slate-700';
+            return `
+              <button onclick="selectQuizOption('${question.field}', '${opt.value}')" class="text-left border ${selectClass} p-4 rounded-2xl transition duration-200">
+                <div class="flex items-center justify-between">
+                  <span class="text-sm font-semibold text-slate-200">${opt.label}</span>
+                  <div class="w-5 h-5 rounded-full border-2 ${isSelected ? 'border-brand-500 bg-brand-500' : 'border-slate-700'} flex items-center justify-center">
+                    ${isSelected ? '<div class="w-2.5 h-2.5 rounded-full bg-white"></div>' : ''}
+                  </div>
+                </div>
+              </button>
+            `;
+          }).join('')}
+        </div>
+      `;
+
+      // Back button state
+      const prevBtn = document.getElementById('quiz-prev-btn');
+      prevBtn.disabled = quizStep === 0;
+
+      // Next button text
+      const nextBtn = document.getElementById('quiz-next-btn');
+      if (quizStep === quizQuestions.length - 1) {
+        nextBtn.innerHTML = `Generate Match <i data-lucide="check" class="w-4 h-4"></i>`;
+      } else {
+        nextBtn.innerHTML = `Next <i data-lucide="chevron-right" class="w-4 h-4"></i>`;
+      }
+      lucide.createIcons();
+    }
+
+    function selectQuizOption(field, value) {
+      quizState[field] = value;
+      renderQuizStep();
+    }
+
+    function nextQuizStep() {
+      const currentField = quizQuestions[quizStep].field;
+      if (!quizState[currentField]) {
+        // Fallback option default if nothing is selected
+        quizState[currentField] = quizQuestions[quizStep].options[0].value;
+      }
+
+      if (quizStep < quizQuestions.length - 1) {
+        quizStep++;
+        renderQuizStep();
+      } else {
+        calculateMatch();
+      }
+    }
+
+    function prevQuizStep() {
+      if (quizStep > 0) {
+        quizStep--;
+        renderQuizStep();
+      }
+    }
+
+    function calculateMatch() {
+      // Hide Question Card
+      document.getElementById('quiz-question-container').parentElement.classList.add('hidden');
+
+      // Scoring Algorithm
+      let bestMatch = null;
+      let highestScore = -100;
+
+      phonesDb.forEach(phone => {
+        let score = 0;
+
+        // 1. Budget Checks
+        if (quizState.budget === "budget") {
+          if (phone.numPrice < 800) score += 40;
+          else if (phone.numPrice <= 1000) score += 10;
+          else score -= 30;
+        } else if (quizState.budget === "premium") {
+          if (phone.numPrice >= 800 && phone.numPrice <= 1100) score += 40;
+          else score += 10; // acceptable fallback
+        } else if (quizState.budget === "ultra") {
+          if (phone.numPrice >= 1100) score += 40;
+          else score += 10;
+        }
+
+        // 2. Hardware Priority Matches
+        if (quizState.priority === "performance") {
+          score += (phone.performanceScore * 3);
+        } else if (quizState.priority === "camera") {
+          score += (phone.cameraScore * 3);
+        } else if (quizState.priority === "battery") {
+          if (phone.id === "oneplus-12") score += 20; // supercharger
+          else if (phone.battery.includes("5000") || phone.battery.includes("5400")) score += 15;
+        }
+
+        // 3. Ecosystem Matcher
+        if (quizState.os === "iOS" && phone.brand === "Apple") score += 50;
+        else if (quizState.os === "Android" && phone.brand !== "Apple") score += 50;
+        else if (quizState.os === "any") score += 20;
+
+        // 4. Physical Size Matcher
+        const weightNum = parseInt(phone.weight);
+        if (quizState.size === "compact") {
+          if (weightNum < 200) score += 20;
+          if (phone.screen.includes("6.1")) score += 15;
+        } else if (quizState.size === "large") {
+          if (weightNum >= 220) score += 20;
+          if (phone.screen.includes("6.8") || phone.screen.includes("6.9")) score += 15;
+        }
+
+        if (score > highestScore) {
+          highestScore = score;
+          bestMatch = phone;
+        }
+      });
+
+      // Render Suggestions Card
+      const card = document.getElementById('matched-device-card');
+      card.innerHTML = `
+        <div class="text-4xl bg-slate-900 border border-slate-800 p-4 rounded-2xl shrink-0">
+          ${bestMatch.icon}
+        </div>
+        <div class="space-y-2 flex-grow">
+          <div>
+            <span class="text-xs text-brand-400 font-bold uppercase tracking-wider">${bestMatch.brand} Flagship</span>
+            <h4 class="text-xl font-extrabold text-white">${bestMatch.name}</h4>
+          </div>
+          <p class="text-xs text-slate-400 leading-relaxed">
+            Highly optimized hardware for your setup. Showcases the ${bestMatch.processor} engine with a breathtaking ${bestMatch.screen.split(',')[0]} display. Starts at an estimated ${bestMatch.price}.
+          </p>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            ${bestMatch.pros.slice(0, 2).map(p => `<span class="text-[10px] px-2 py-0.5 bg-emerald-950/40 text-emerald-400 border border-emerald-900/30 rounded-md">✓ ${p}</span>`).join('')}
+          </div>
+        </div>
+      `;
+
+      // Set comparison trigger
+      document.getElementById('compare-matched-btn').onclick = () => {
+        document.getElementById('compare-select-a').value = bestMatch.id;
+        updateComparison();
+        switchTab('compare');
+      };
+
+      document.getElementById('quiz-results').classList.remove('hidden');
+    }
+
+    function restartQuiz() {
+      initQuiz();
+    }
+
+    // ==================== AI SPECIALIST CHAT LOGIC (GEMINI API) ====================
+    const apiKey = ""; // Implicitly active in the preview runtime
+
+    async function sendChatMessage() {
+      const inputEl = document.getElementById('ai-input');
+      const query = inputEl.value.trim();
+      if (!query) return;
+
+      // Render user dialog
+      appendChatMessage("user", query);
+      inputEl.value = "";
+
+      // Render loading state
+      const loadingBar = document.getElementById('ai-loading-bar');
+      loadingBar.classList.remove('hidden');
+
+      try {
+        const responseText = await callGeminiAPI(query);
+        appendChatMessage("ai", responseText);
+      } catch (err) {
+        appendChatMessage("ai", "I encountered an error retrieving live details. Please ensure network connectivity or try formatting your request again.");
+      } finally {
+        loadingBar.classList.add('hidden');
+      }
+    }
+
+    function handleChatKey(e) {
+      if (e.key === 'Enter') {
+        sendChatMessage();
+      }
+    }
+
+    function usePreloadQuestion(questionText) {
+      document.getElementById('ai-input').value = questionText;
+      sendChatMessage();
+    }
+
+    function appendChatMessage(sender, text) {
+      const chatFeed = document.getElementById('ai-chat-feed');
+      const container = document.createElement('div');
+      
+      if (sender === "user") {
+        container.className = "flex justify-end gap-4 max-w-3xl ml-auto";
+        container.innerHTML = `
+          <div class="bg-brand-600 text-white rounded-2xl p-4 text-sm max-w-full">
+            <p>${text}</p>
+          </div>
+          <div class="w-8 h-8 rounded-xl bg-slate-800 flex items-center justify-center shrink-0">
+            <i data-lucide="user" class="w-4 h-4 text-slate-300"></i>
+          </div>
+        `;
+      } else {
+        container.className = "flex gap-4 max-w-3xl";
+        container.innerHTML = `
+          <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-500 flex items-center justify-center shrink-0 shadow-md">
+            <i data-lucide="bot" class="w-4 h-4 text-white"></i>
+          </div>
+          <div class="bg-slate-950 border border-slate-800/80 rounded-2xl p-4 text-slate-300 text-sm space-y-2 max-w-full">
+            ${parseMarkdownText(text)}
+          </div>
+        `;
+      }
+
+      chatFeed.appendChild(container);
+      lucide.createIcons();
+      chatFeed.scrollTop = chatFeed.scrollHeight;
+    }
+
+    // Exponential Backoff Call implementation for Gemini API
+    async function callGeminiAPI(query) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+      const payload = {
+        contents: [{ parts: [{ text: query }] }],
+        systemInstruction: {
+          parts: [{ text: "You are SmartHub's Expert Advisor. Provide concise, clear, and objective advice regarding smartphone specifications, differences, pros/cons, or purchasing suggestions. Highlight price/performance ratios and use bullet points where helpful. If comparing, structure comparisons cleanly." }]
+        },
+        tools: [{ "google_search": {} }] // Live search grounding for up-to-date specs/costs
+      };
+
+      let delay = 1000;
+      for (let attempt = 0; attempt < 5; attempt++) {
+        try {
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            return data.candidates?.[0]?.content?.parts?.[0]?.text || "No insights found for this query.";
+          }
+        } catch (err) {
+          // Silent catch for exponential backoff retrying
+        }
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 2;
+      }
+      throw new Error("Failed to contact API after 5 attempts.");
+    }
+
+    // Highly lightweight markdown processor
+    function parseMarkdownText(text) {
+      let parsed = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/`([^`]+)`/g, '<code class="bg-slate-900 border border-slate-800 px-1 py-0.5 rounded text-xs font-mono">$1</code>')
+        .replace(/\n\s*-\s+(.*)/g, '<li class="ml-4 list-disc mt-1">$1</li>')
+        .replace(/\n/g, '<br/>');
+      return parsed;
+    }
+  </script>
+</body>
+</html>
+
+```
